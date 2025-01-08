@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Taches : " ~ task.id %}
+
+{% block body %}
+<div class="container">  
+  <h1>{{ task.title }}</h1>
+  <a href="{{ path('assign_user') }}" class="btn btn-primary">Ajouter User</a>
+  {% if task.project != null %}
+  <ul class="list-group">
+    <a class="list-group-item list-group-item-action" href="{{ url('project.show', {id: task.project.id, name: task.project.name}) }}">From project :  <strong>{{task.project.name}}</strong></a>
+  </ul>
+  {% endif %}
+
+  <p>Description: {{ task.description }}</p>
+  <p>Category: {{ task.category.label }}</p>
+  <p>Estimation : {{ task.estimates }} heures</p>
+  <p>Date d'échéance : {{ task.dueDate ? task.dueDate|date('Y-m-d H:i:s') : 'Non définie' }}</p>
+  <p>Date de création : {{ task.createdAt ? task.createdAt|date('Y-m-d H:i:s') : 'Non définie' }}</p>
+  <p>Dernière mise à jour : {{ task.updatedAt ? task.updatedAt|date('Y-m-d H:i:s') : 'Non définie' }}</p>
+  
+  {% if task.deletedAt == null %}
+    <a href="{{ path('task.edit', {'id': task.id}) }}" class="btn btn-primary">Modifier</a>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+      Supprimer
+    </button>
+  {% elseif is_granted('ROLE_ADMIN') %}
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+      Supprimer définitivement
+    </button>
+  {% endif %}
+  
+  {% if task.deletedAt != null %}
+    <a href="{{ path('task.restore', {'id': task.id}) }}" class="btn btn-primary">Restore</a>
+    <a href="{{ path('task.defdelete', {'id': task.id}) }}" class="btn btn-danger">Supprimer Definitivement</a>
+  {% endif %}
+  
+  {% include 'partials/modal.html.twig' %}
+</div>
+{% endblock %}

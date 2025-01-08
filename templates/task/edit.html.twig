@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Taches : " ~ task.id %}
+
+{% block body %}
+<div class="container">
+  <h1>{{ task.title }}</h1>
+
+  {{ form(form) }}
+</div>
+{% endblock %}

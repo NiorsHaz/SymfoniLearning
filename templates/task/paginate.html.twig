@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Les taches" %}
+
+{% block body %}
+<div class="container">
+    <table class="table">
+        <thead>
+        <tr>
+            {# <th>ID</th> #}
+            <th>{{ knp_pagination_sortable(tasks,'ID','t.id') }}</th>
+            <th>Title</th>
+            <th>Estimation tache</th>
+
+        </tr>
+        </thead>
+        {% for task in tasks %}
+        <tbody>
+            <td>{{task.id}}</td>
+            <td>
+                <a class="list-group-item list-group-item-action" href="{{ url('task.show', {id: task.id, slug: task.slug}) }}">{{task.title}}</a>
+            </td>
+            <td>{{task.estimates}}</td>
+        </tbody>
+        {% endfor %}
+    </table>
+
+    {# <div class="d-flex">
+        {% if page > 1 %}
+            <a href="{{path('task.index', {page: page - 1}) }}" class="btn btn-secondary">Page précedent</a>
+        {% endif %}
+          {% if page < maxPage %}
+            <a href="{{path('task.index', {page: page + 1}) }}" class="btn btn-secondary">Page suivante</a>
+        {% endif %}
+    </div> #}
+
+    {{ knp_pagination_render(tasks) }}
+
+</div>
+{% endblock %}

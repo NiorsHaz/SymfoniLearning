@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Assign Tasks to Project{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Assign Tasks to Project</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.project) }}
+        {{ form_row(form.tasks) }}
+        <div>
+            {{ form_widget(form.submit) }}
+        </div>
+    {{ form_end(form) }}
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endblock %}

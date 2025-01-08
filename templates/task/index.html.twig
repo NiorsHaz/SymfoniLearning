@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title "Les taches" %}
+
+{% block body %}
+<div class="container">
+    <form method="get" class="mb-4">
+        <div class="row">
+            {# Barre de recherche par titre #}
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Recherche par titre" value="{{ searchTitle }}">
+            </div>
+
+            {# Filtre Min #}
+            <div class="col-md-2">
+                <input type="number" name="min_estimate" class="form-control" placeholder="Estimation Min" value="{{ minEstimate }}">
+            </div>
+
+            {# Filtre Max #}
+            <div class="col-md-2">
+                <input type="number" name="max_estimate" class="form-control" placeholder="Estimation Max" value="{{ maxEstimate }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="category" class="form-control">
+                    <option value=0>Filtre category</option>
+                    {% for category in categories %}
+                        {% for c in category %}
+                        <option value={{c.id}}>{{c.label}}</option>
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            {# Bouton de filtrage #}
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="d-flex justify-content-between my-2">
+        <a href="{{ path('task.create') }}" class="btn btn-primary">Créer une tache</a>
+        <a href="{{ path('assign_tasks') }}" class="btn btn-primary">Assigner une tache</a>
+        <a href="{{ path('task.trashbin') }}" class="btn btn-danger">Corbeille</a>
+        <p>Total estimation : {{ totalEstimates }}</p>
+    </div>
+
+
+    <ul class="list-group">
+        {% for task in tasks %}
+            <a class="list-group-item list-group-item-action" href="{{ url('task.show', {id: task.id, slug: task.slug}) }}">{{task.title}} (Estimation : {{task.estimates}})</a>
+        {% endfor %}
+    </ul>
+
+    {{ knp_pagination_render(tasks) }}
+
+</div>
+{% endblock %}
