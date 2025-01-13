@@ -8,6 +8,7 @@ class ProjectWithTaskCountDTO
     public readonly int $id,
     public readonly string $title,
     public readonly int $taskCount,
+    public readonly ?\DateTimeImmutable $deletedAt
   )
   {
     

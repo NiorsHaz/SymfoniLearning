@@ -1,0 +1,9 @@
+nelmio_cors:
+    defaults:
+        allow_credentials: false
+        allow_origin: ['*']  # Or specify allowed origins, e.g., ['http://localhost:8080']
+        allow_headers: ['Content-Type', 'Authorization', 'X-BinaryBox-Api-Key']
+        allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        max_age: 3600
+    paths:
+        '^/api/': ~

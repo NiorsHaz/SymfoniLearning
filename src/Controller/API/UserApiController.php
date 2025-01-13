@@ -8,6 +8,7 @@ use App\Repository\UserRepository;
 use App\Service\DeleteService;
 use App\Service\JwtTokenManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +24,20 @@ use Symfony\Component\Serializer\SerializerInterface;
 class UserApiController extends AbstractController
 {
     private $jwtTokenManager;
+    private $logger;
 
-    public function __construct(JwtTokenManager $jwtTokenManager)
+    public function __construct(JwtTokenManager $jwtTokenManager, LoggerInterface $logger)
     {
         $this->jwtTokenManager = $jwtTokenManager;
+        $this->logger = $logger;
+    }
+
+    public function checkCors(){
+        $response = new JsonResponse();
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-binarybox-api-key');
+        return $response;
     }
 
     // *[CREATE]*
@@ -37,10 +48,15 @@ class UserApiController extends AbstractController
         'groups' => ['users.create']
     ])] User $user, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $em)
     {
+        $this->logger->info('Entering create method');
+        $this->logger->info('User data: ' . json_encode($user));
+        
         $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
         $em->persist($user);
         $em->flush();
-        return $this->json($user, 200, [], [
+        return $this->json($user, 200, [
+            'Access-Control-Allow-Origin' => '*'
+        ], [
             'groups' => ['users.show']
         ]);
     }
@@ -138,16 +154,25 @@ class UserApiController extends AbstractController
         return new Response(null, 204);
     }
 
-    #[Route("/api/users/login", methods: "POST")]
+    #[Route("/api/users/login", methods:["POST", "OPTIONS"])]
     public function login(Request $request, UserRepository $repository,  UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $em)
     {
+        $response = $this->checkCors();
+
+        if($request->getMethod() === "OPTIONS"){
+            return $response;
+        }
+
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
         $user = $repository->findOneBy(['email' => $email]);
         if (!$user || !$userPasswordHasher->isPasswordValid($user, $password)) {
-            return new JsonResponse(['message' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['message' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED,
+            [
+                'Access-Control-Allow-Origin' => '*',
+            ]);
         }
 
         $claims = [
@@ -162,6 +187,9 @@ class UserApiController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return new JsonResponse(['token' => $user->getApiToken()]);
+        return new JsonResponse(['token' => $user->getApiToken()], Response::HTTP_OK,
+        [
+            'Access-Control-Allow-Origin' => '*',
+        ]);
     }
 }

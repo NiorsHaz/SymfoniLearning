@@ -57,7 +57,7 @@ class ProjectRepository extends ServiceEntityRepository
     public function getQueryBuilderFindAllWithTaskCount() : QueryBuilder {
         return (
             $this->createQueryBuilder('p')
-                ->select('NEW App\DTO\ProjectWithTaskCountDTO(p.id, p.name, COUNT(t.id))')
+                ->select('NEW App\DTO\ProjectWithTaskCountDTO(p.id, p.name, COUNT(t.id), p.deletedAt)')
                 ->leftJoin('p.tasks', 't', 'WITH', 't.deletedAt IS NULL')
                 ->groupBy('p.id')
         );

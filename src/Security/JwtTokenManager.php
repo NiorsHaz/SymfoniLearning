@@ -65,6 +65,7 @@ class JwtTokenManager
     {
         $authHeader = $request->headers->get('Authorization');
         if ($authHeader && preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            // dump($matches[2]);
             return $matches[1];
         }
         return null;
